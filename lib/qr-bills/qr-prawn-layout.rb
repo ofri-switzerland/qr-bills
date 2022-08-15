@@ -40,7 +40,7 @@ module QRPRAWNLayout
 
             pdf.text "#{I18n.t("qrbills.account").capitalize} / #{I18n.t("qrbills.payable_to").capitalize}", size: 6.pt, style: :bold
             pdf.text "#{params[:bill_params][:creditor][:iban]}", size: 8.pt
-            pdf.text "#{render_address(params[:bill_params][:creditor][:address])}", size: 8.pt, inline_format: true
+            pdf.text "#{render_address(params[:bill_params][:creditor][:address], pdf)}", size: 8.pt, inline_format: true
 
             if !params[:bill_params][:reference].nil? && !params[:bill_params][:reference].empty?
               pdf.move_down 4.mm
@@ -50,7 +50,7 @@ module QRPRAWNLayout
             pdf.move_down 4.mm
 
             pdf.text I18n.t("qrbills.payable_by").capitalize, size: 6.pt, style: :bold
-            pdf.text "#{render_address(params[:bill_params][:debtor][:address])}", size: 8.pt, inline_format: true
+            pdf.text "#{render_address(params[:bill_params][:debtor][:address], pdf)}", size: 8.pt, inline_format: true
             pdf.move_down 8.mm
 
             bounding_box_cursor = pdf.cursor
@@ -96,7 +96,7 @@ module QRPRAWNLayout
 
             pdf.text "#{I18n.t("qrbills.account").capitalize} / #{I18n.t("qrbills.payable_to").capitalize}", size: 8.pt, style: :bold
             pdf.text "#{params[:bill_params][:creditor][:iban]}", size: 10.pt
-            pdf.text "#{render_address(params[:bill_params][:creditor][:address])}", size: 10.pt, inline_format: true
+            pdf.text "#{render_address(params[:bill_params][:creditor][:address], pdf)}", size: 10.pt, inline_format: true
 
             if !params[:bill_params][:reference].nil? && !params[:bill_params][:reference].empty?
               pdf.move_down 4.mm
@@ -112,7 +112,7 @@ module QRPRAWNLayout
             pdf.move_down 4.mm
 
             pdf.text "#{I18n.t("qrbills.payable_by").capitalize}", size: 8.pt, style: :bold
-            pdf.text "#{render_address(params[:bill_params][:debtor][:address])}", size: 10.pt, inline_format: true
+            pdf.text "#{render_address(params[:bill_params][:debtor][:address], pdf)}", size: 10.pt, inline_format: true
           end
 
           # Payment Panel - Further information sub-section
@@ -137,12 +137,24 @@ module QRPRAWNLayout
     end
   end
 
-  def self.render_address(address)
+  def self.render_address(address, pdf)
     case address[:type]
     when 'S'
-      format("%s<br>%s %s<br>%s %s<br>", address[:name], address[:line1], address[:line2], address[:postal_code], address[:town])
+      utf8(pdf) do |p|
+        format("%s<br>%s %s<br>%s %s<br>", address[:name], address[:line1], address[:line2], address[:postal_code], address[:town])
+      end
     when 'K'
-      format("%s<br>%s<br>%s<br>", address[:name], address[:line1], address[:line2])
+      utf8(pdf) do |p|
+        format("%s<br>%s<br>%s<br>", address[:name], address[:line1], address[:line2])
+      end
+    end
+  end
+
+  def self.utf8(pdf)
+    pdf.font(Rails.root.join('fonts/deja_vu_sans.ttf')) do
+      pdf.font_size(10) do
+        yield pdf
+      end
     end
   end
 end
