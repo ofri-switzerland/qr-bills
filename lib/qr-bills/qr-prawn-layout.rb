@@ -151,7 +151,7 @@ module QRPRAWNLayout
   end
 
   def self.utf8(pdf)
-    pdf.font(Rails.root.join('fonts/deja_vu_sans.ttf')) do
+    pdf.font(Rails.root.join('lib/prawn/deja_vu_sans.ttf')) do
       pdf.font_size(10) do
         yield pdf
       end
