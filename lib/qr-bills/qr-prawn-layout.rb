@@ -96,7 +96,7 @@ module QRPRAWNLayout
 
             pdf.text "#{I18n.t("qrbills.account").capitalize} / #{I18n.t("qrbills.payable_to").capitalize}", size: 8.pt, style: :bold
             pdf.text "#{params[:bill_params][:creditor][:iban]}", size: 10.pt
-            pdf.text "#{render_address(params[:bill_params][:creditor][:address], pdf)}", size: 10.pt, inline_format: true
+            pdf.text "#{render_address(params[:bill_params][:creditor][:address], pdf)}", size: 10.pt
 
             if !params[:bill_params][:reference].nil? && !params[:bill_params][:reference].empty?
               pdf.move_down 4.mm
@@ -112,7 +112,7 @@ module QRPRAWNLayout
             pdf.move_down 4.mm
 
             pdf.text "#{I18n.t("qrbills.payable_by").capitalize}", size: 8.pt, style: :bold
-            pdf.text "#{render_address(params[:bill_params][:debtor][:address], pdf)}", size: 10.pt, inline_format: true
+            pdf.text "#{render_address(params[:bill_params][:debtor][:address], pdf)}", size: 10.pt
           end
 
           # Payment Panel - Further information sub-section
