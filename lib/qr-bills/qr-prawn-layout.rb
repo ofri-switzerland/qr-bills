@@ -131,25 +131,22 @@ module QRPRAWNLayout
             pdf.stroke_vertical_line 0, 105.mm, at: 62.mm
             pdf.stroke_horizontal_line 0, 210.mm, at: 105.mm
           pdf.undash
-
         end
       end
     end
   end
 
   def self.render_address(address, pdf)
-    case address[:type]
-    when 'S'
-      pdf.font('lib/prawn/deja_vu_sans.ttf') do
-        pdf.text(address[:name], size: 8)
-        pdf.text("#{address[:line1]} #{address[:line2]}", size: 8)
-        pdf.text("#{address[:postal_code]} #{address[:town]}", size: 8)
-      end
-    when 'K'
-      pdf.font('lib/prawn/deja_vu_sans.ttf') do |p|
-        pdf.text(address[:name], size: 8)
-        pdf.text(address[:line1], size: 8)
-        pdf.text(address[:line2], size: 8)
+    pdf.font('lib/prawn/deja_vu_sans.ttf') do |p|
+      case address[:type]
+      when 'S'
+        p.text(address[:name], size: 8)
+        p.text("#{address[:line1]} #{address[:line2]}", size: 8)
+        p.text("#{address[:postal_code]} #{address[:town]}", size: 8)
+      when 'K'
+        p.text(address[:name], size: 8)
+        p.text(address[:line1], size: 8)
+        p.text(address[:line2], size: 8)
       end
     end
   end
