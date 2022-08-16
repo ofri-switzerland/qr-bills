@@ -40,7 +40,7 @@ module QRPRAWNLayout
 
             pdf.text "#{I18n.t("qrbills.account").capitalize} / #{I18n.t("qrbills.payable_to").capitalize}", size: 6.pt, style: :bold
             pdf.text "#{params[:bill_params][:creditor][:iban]}", size: 8.pt
-            pdf.text "#{render_address(params[:bill_params][:creditor][:address], pdf)}", size: 8.pt, inline_format: true
+            render_address(params[:bill_params][:creditor][:address], pdf, 8.pt)
 
             if !params[:bill_params][:reference].nil? && !params[:bill_params][:reference].empty?
               pdf.move_down 4.mm
@@ -50,7 +50,7 @@ module QRPRAWNLayout
             pdf.move_down 4.mm
 
             pdf.text I18n.t("qrbills.payable_by").capitalize, size: 6.pt, style: :bold
-            pdf.text "#{render_address(params[:bill_params][:debtor][:address], pdf)}", size: 8.pt, inline_format: true
+            render_address(params[:bill_params][:debtor][:address], pdf, 8.pt)
             pdf.move_down 8.mm
 
             bounding_box_cursor = pdf.cursor
@@ -96,7 +96,7 @@ module QRPRAWNLayout
 
             pdf.text "#{I18n.t("qrbills.account").capitalize} / #{I18n.t("qrbills.payable_to").capitalize}", size: 8.pt, style: :bold
             pdf.text "#{params[:bill_params][:creditor][:iban]}", size: 10.pt
-            pdf.text "#{render_address(params[:bill_params][:creditor][:address], pdf)}", size: 10.pt
+            render_address(params[:bill_params][:creditor][:address], pdf, 10.pt)
 
             if !params[:bill_params][:reference].nil? && !params[:bill_params][:reference].empty?
               pdf.move_down 4.mm
@@ -112,7 +112,7 @@ module QRPRAWNLayout
             pdf.move_down 4.mm
 
             pdf.text "#{I18n.t("qrbills.payable_by").capitalize}", size: 8.pt, style: :bold
-            pdf.text "#{render_address(params[:bill_params][:debtor][:address], pdf)}", size: 10.pt
+            render_address(params[:bill_params][:debtor][:address], pdf, 10.pt)
           end
 
           # Payment Panel - Further information sub-section
@@ -136,17 +136,17 @@ module QRPRAWNLayout
     end
   end
 
-  def self.render_address(address, pdf)
+  def self.render_address(address, pdf, size)
     pdf.font('lib/prawn/deja_vu_sans.ttf') do
       case address[:type]
       when 'S'
-        pdf.text(address[:name], size: 8)
-        pdf.text("#{address[:line1]} #{address[:line2]}", size: 8)
-        pdf.text("#{address[:postal_code]} #{address[:town]}", size: 8)
+        pdf.text(address[:name], size: size)
+        pdf.text("#{address[:line1]} #{address[:line2]}", size: size)
+        pdf.text("#{address[:postal_code]} #{address[:town]}", size: size)
       when 'K'
-        pdf.text(address[:name], size: 8)
-        pdf.text(address[:line1], size: 8)
-        pdf.text(address[:line2], size: 8)
+        pdf.text(address[:name], size: size)
+        pdf.text(address[:line1], size: size)
+        pdf.text(address[:line2], size: size)
       end
     end
   end
