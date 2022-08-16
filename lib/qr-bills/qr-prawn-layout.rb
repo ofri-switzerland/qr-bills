@@ -141,18 +141,22 @@ module QRPRAWNLayout
     case address[:type]
     when 'S'
       utf8(pdf) do |p|
-        p.text(format("%s<br>%s %s<br>%s %s<br>", address[:name], address[:line1], address[:line2], address[:postal_code], address[:town]), size: 10)
+        p.text(address[:name], size: 8)
+        p.text("#{address[:line1]} #{address[:line2]}", size: 8)
+        p.text("#{address[:postal_code]} #{address[:town]}", size: 8)
       end
     when 'K'
       utf8(pdf) do |p|
-        p.text(format("%s<br>%s<br>%s<br>", address[:name], address[:line1], address[:line2]), size: 10)
+        p.text(address[:name], size: 8)
+        p.text(address[:line1], size: 8)
+        p.text(address[:line2], size: 8)
       end
     end
   end
 
   def self.utf8(pdf)
     pdf.font('lib/prawn/deja_vu_sans.ttf') do
-      pdf.font_size(10) do
+      pdf.font_size(8) do
         yield pdf
       end
     end
