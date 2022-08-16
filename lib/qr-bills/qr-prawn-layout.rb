@@ -156,9 +156,7 @@ module QRPRAWNLayout
 
   def self.utf8(pdf)
     pdf.font('lib/prawn/deja_vu_sans.ttf') do
-      pdf.font_size(8) do
-        yield pdf
-      end
+      yield pdf
     end
   end
 end
