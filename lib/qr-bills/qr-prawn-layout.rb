@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'qr-bills/qr-generator'
 require 'prawn'
 require 'prawn-svg'
-require "prawn/measurement_extensions"
+require 'prawn/measurement_extensions'
 
 module QRPRAWNLayout
   attr_reader :document, :type
@@ -35,101 +37,114 @@ module QRPRAWNLayout
           pdf.bounding_box([5.mm, y_pos], width: 52.mm, height: 105.mm) do
             pdf.move_down 5.mm
 
-            pdf.text I18n.t("qrbills.receipt").capitalize, size: 11.pt, style: :bold
+            pdf.text I18n.t('qrbills.receipt').capitalize, size: 11.pt, style: :bold
             pdf.move_down 4.mm
 
-            pdf.text "#{I18n.t("qrbills.account").capitalize} / #{I18n.t("qrbills.payable_to").capitalize}", size: 6.pt, style: :bold
-            pdf.text "#{params[:bill_params][:creditor][:iban]}", size: 8.pt
+            pdf.text "#{I18n.t('qrbills.account').capitalize} / #{I18n.t('qrbills.payable_to').capitalize}",
+                     size: 6.pt, style: :bold
+            pdf.text params[:bill_params][:creditor][:iban].to_s, size: 8.pt
             render_address(params[:bill_params][:creditor][:address], pdf, 8.pt)
 
-            if !params[:bill_params][:reference].nil? && !params[:bill_params][:reference].empty?
+            if params[:bill_params][:reference].present?
               pdf.move_down 4.mm
-              pdf.text I18n.t("qrbills.reference").capitalize, size: 6.pt, style: :bold
-              pdf.text "#{params[:bill_params][:reference]}", size: 8.pt
+              pdf.text I18n.t('qrbills.reference').capitalize, size: 6.pt, style: :bold
+              pdf.text params[:bill_params][:reference].to_s, size: 8.pt
             end
             pdf.move_down 4.mm
 
-            pdf.text I18n.t("qrbills.payable_by").capitalize, size: 6.pt, style: :bold
+            pdf.text I18n.t('qrbills.payable_by').capitalize, size: 6.pt, style: :bold
             render_address(params[:bill_params][:debtor][:address], pdf, 8.pt)
             pdf.move_down 8.mm
 
             bounding_box_cursor = pdf.cursor
             pdf.bounding_box([0, bounding_box_cursor], width: 20.mm) do
-              pdf.text I18n.t("qrbills.currency").capitalize, size: 6.pt, style: :bold
-              pdf.text "#{params[:bill_params][:currency]}", size: 8.pt
+              pdf.text I18n.t('qrbills.currency').capitalize, size: 6.pt, style: :bold
+              pdf.text params[:bill_params][:currency].to_s, size: 8.pt
             end
 
             pdf.bounding_box([20.mm, bounding_box_cursor], width: 20.mm) do
-              pdf.text I18n.t("qrbills.amount").capitalize, size: 6.pt, style: :bold
-              pdf.text "#{format('%.2f', params[:bill_params][:amount])}", size: 8.pt
+              pdf.text I18n.t('qrbills.amount').capitalize, size: 6.pt, style: :bold
+              pdf.text format('%.2f', params[:bill_params][:amount]).to_s, size: 8.pt
             end
 
             pdf.move_down 6.mm
-            pdf.text I18n.t("qrbills.acceptance_point"), align: :right, size: 6.pt, style: :bold
+            pdf.text I18n.t('qrbills.acceptance_point'), align: :right, size: 6.pt, style: :bold
           end
 
           # Payment Panel - QR code sub-section
           pdf.bounding_box([67.mm, y_pos], width: 51.mm, height: 90.mm) do
             pdf.move_down 5.mm
 
-            pdf.text I18n.t("qrbills.payment_part").capitalize, size: 11.pt, style: :bold
+            pdf.text I18n.t('qrbills.payment_part').capitalize, size: 11.pt, style: :bold
             pdf.move_down 5.mm
 
-            pdf.svg QRGenerator.build_svg(params[:bill_params]), width: 46.mm, height: 46.mm
+            enable_web_requests = params.dig(:output_params, :enable_web_requests)
+
+            enable_web_requests = false if enable_web_requests.nil?
+
+            pdf.svg(
+              QRGenerator.build_svg(params[:bill_params]),
+              width: 46.mm,
+              height: 46.mm,
+              enable_web_requests: enable_web_requests
+            )
             pdf.move_down 5.mm
 
             payment_currency_bounding_box_cursor = pdf.cursor
             pdf.bounding_box([0, payment_currency_bounding_box_cursor], width: 20.mm) do
-              pdf.text I18n.t("qrbills.currency").capitalize, size: 8.pt, style: :bold
-              pdf.text "#{params[:bill_params][:currency]}", size: 10.pt
+              pdf.text I18n.t('qrbills.currency').capitalize, size: 8.pt, style: :bold
+              pdf.text params[:bill_params][:currency].to_s, size: 10.pt
             end
 
             pdf.bounding_box([20.mm, payment_currency_bounding_box_cursor], width: 20.mm) do
-              pdf.text I18n.t("qrbills.amount").capitalize, size: 8.pt, style: :bold
-              pdf.text "#{format('%.2f', params[:bill_params][:amount])}", size: 10.pt
+              pdf.text I18n.t('qrbills.amount').capitalize, size: 8.pt, style: :bold
+              pdf.text format('%.2f', params[:bill_params][:amount]).to_s, size: 10.pt
             end
           end
 
           # Payment Panel - Account / Payable to sub-section
-          pdf. bounding_box([118.mm, y_pos], width: 92.mm, height: 90.mm) do
+          pdf.bounding_box([118.mm, y_pos], width: 92.mm, height: 90.mm) do
             pdf.move_down 5.mm
 
-            pdf.text "#{I18n.t("qrbills.account").capitalize} / #{I18n.t("qrbills.payable_to").capitalize}", size: 8.pt, style: :bold
-            pdf.text "#{params[:bill_params][:creditor][:iban]}", size: 10.pt
+            pdf.text "#{I18n.t('qrbills.account').capitalize} / #{I18n.t('qrbills.payable_to').capitalize}",
+                     size: 8.pt, style: :bold
+            pdf.text params[:bill_params][:creditor][:iban].to_s, size: 10.pt
             render_address(params[:bill_params][:creditor][:address], pdf, 10.pt)
 
-            if !params[:bill_params][:reference].nil? && !params[:bill_params][:reference].empty?
+            if params[:bill_params][:reference].present?
               pdf.move_down 4.mm
-              pdf.text "#{I18n.t("qrbills.reference").capitalize}", size: 8.pt, style: :bold
-              pdf.text "#{params[:bill_params][:reference]}", size: 10.pt
+              pdf.text I18n.t('qrbills.reference').capitalize.to_s, size: 8.pt, style: :bold
+              pdf.text params[:bill_params][:reference].to_s, size: 10.pt
             end
 
-            if !params[:bill_params][:additionally_information].nil? && !params[:bill_params][:additionally_information].empty?
+            if params[:bill_params][:additionally_information].present?
               pdf.move_down 4.mm
-              pdf.text "#{I18n.t("qrbills.additional_information").capitalize}", size: 8.pt, style: :bold
-              pdf.text "#{params[:bill_params][:additionally_information]}", size: 10.pt
+              pdf.text I18n.t('qrbills.additional_information').capitalize.to_s, size: 8.pt, style: :bold
+              pdf.text params[:bill_params][:additionally_information].to_s, size: 10.pt
             end
             pdf.move_down 4.mm
 
-            pdf.text "#{I18n.t("qrbills.payable_by").capitalize}", size: 8.pt, style: :bold
+            pdf.text I18n.t('qrbills.payable_by').capitalize.to_s, size: 8.pt, style: :bold
             render_address(params[:bill_params][:debtor][:address], pdf, 10.pt)
           end
 
           # Payment Panel - Further information sub-section
           pdf.bounding_box([67.mm, y_pos - 85.mm], width: 138.mm, height: 10.mm) do
-            if !params[:bill_params][:bill_information_coded].nil? && !params[:bill_params][:bill_information_coded].empty?
-              pdf.text "<b>#{I18n.t("qrbills.name").capitalize}</b> AV1: #{params[:bill_params][:bill_information_coded]}", size: 7.pt, inline_format: true
+            if params[:bill_params][:bill_information_coded].present?
+              pdf.text "<b>#{I18n.t('qrbills.name').capitalize}</b> AV1: #{params[:bill_params][:bill_information_coded]}",
+                       size: 7.pt, inline_format: true
             end
 
-            if !params[:bill_params][:alternative_scheme_parameters].nil? && !params[:bill_params][:alternative_scheme_parameters].empty?
-              pdf.text "<b>#{I18n.t("qrbills.name").capitalize}</b> AV2: #{params[:bill_params][:alternative_scheme_parameters]}", size: 7.pt, inline_format: true
+            if params[:bill_params][:alternative_scheme_parameters].present?
+              pdf.text "<b>#{I18n.t('qrbills.name').capitalize}</b> AV2: #{params[:bill_params][:alternative_scheme_parameters]}",
+                       size: 7.pt, inline_format: true
             end
           end
 
-          pdf.stroke_color("808080")
+          pdf.stroke_color('808080')
           pdf.dash(2, space: 2)
-            pdf.stroke_vertical_line 0, 105.mm, at: 62.mm
-            pdf.stroke_horizontal_line 0, 210.mm, at: 105.mm
+          pdf.stroke_vertical_line 0, 105.mm, at: 62.mm
+          pdf.stroke_horizontal_line 0, 210.mm, at: 105.mm
           pdf.undash
         end
       end

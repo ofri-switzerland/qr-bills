@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 module QRParams
-  QR_BILL_WITH_QR_REFERENCE       = "orange_with_reference"
-  QR_BILL_WITH_CREDITOR_REFERENCE = "red_with_reference"
-  QR_BILL_WITHOUT_REFERENCE       = "red_without_reference"
+  QR_BILL_WITH_QR_REFERENCE       = 'orange_with_reference'
+  QR_BILL_WITH_CREDITOR_REFERENCE = 'red_with_reference'
+  QR_BILL_WITHOUT_REFERENCE       = 'red_without_reference'
 
   def self.get_qr_params
     {
-      bill_type: "", # see global variables / README
+      bill_type: '', # see global variables / README
       qrcode_format: nil, # png or svg, overwrites qrcode_filepath
-      qrcode_filepath: "", # deprecated, where to store the qrcode, i.e. : /tmp/qrcode_1234.png
+      qrcode_filepath: '', # deprecated, where to store the qrcode, i.e. : /tmp/qrcode_1234.png
       fonts: {
         eot: File.expand_path("#{File.dirname(__FILE__)}/../../web/assets/fonts/LiberationSans-Regular.eot"),
         woff: File.expand_path("#{File.dirname(__FILE__)}/../../web/assets/fonts/LiberationSans-Regular.woff"),
@@ -20,38 +22,39 @@ module QRParams
       bill_params: {
         language: I18n.locale,
         amount: 0.0,
-        currency: "CHF",
-        reference_type: "", # QRR = QR reference, SCOR = Creditor reference, NON = without reference
-        reference: "", # qr reference or creditor reference (iso-11649)
-        additionally_information: "",
-        bill_information_coded: "",
-        alternative_scheme_parameters: "",
+        currency: 'CHF',
+        reference_type: '', # QRR = QR reference, SCOR = Creditor reference, NON = without reference
+        reference: '', # qr reference or creditor reference (iso-11649)
+        additionally_information: '',
+        bill_information_coded: '',
+        alternative_scheme_parameters: '',
         creditor: {
           address: {
-            type: "S",
-            name: "",
-            line1: "",
-            line2: "",
-            postal_code: "",
-            town: "",
-            country: "",
-            iban: ""
-          },
+            type: 'S',
+            name: '',
+            line1: '',
+            line2: '',
+            postal_code: '',
+            town: '',
+            country: '',
+            iban: ''
+          }
         },
         debtor: {
           address: {
-            type: "S",
-            name: "",
-            line1: "",
-            line2: "",
-            postal_code: "",
-            town: "",
-            country: "",
-          },
+            type: 'S',
+            name: '',
+            line1: '',
+            line2: '',
+            postal_code: '',
+            town: '',
+            country: ''
+          }
         }
       },
       output_params: {
-        format: "html"
+        format: 'html',
+        enable_web_requests: false
       }
     }
   end
@@ -71,13 +74,13 @@ module QRParams
       raise ArgumentError, "#{QRExceptions::INVALID_PARAMETERS}: bill type is not supported"
     end
   end
-  
+
   def self.base_params_valid?(params)
-    if params[:bill_type] == "" || params[:bill_type] == nil
+    if ['', nil].include?(params[:bill_type])
       raise ArgumentError, "#{QRExceptions::INVALID_PARAMETERS}: bill type cannot be blank"
     end
 
-    if params.dig(:bill_params, :currency) == "" || params.dig(:bill_params, :currency) == nil
+    if ['', nil].include?(params.dig(:bill_params, :currency))
       raise ArgumentError, "#{QRExceptions::INVALID_PARAMETERS}: currency cannot be blank"
     end
 
@@ -85,38 +88,43 @@ module QRParams
   end
 
   def self.qr_bill_with_qr_reference_valid?(params)
-    if params[:bill_params][:reference_type] != "QRR"
-      raise ArgumentError, "#{QRExceptions::INVALID_PARAMETERS}: reference type must be 'QRR' for QR bill with standard reference"
+    if params[:bill_params][:reference_type] != 'QRR'
+      raise ArgumentError,
+            "#{QRExceptions::INVALID_PARAMETERS}: reference type must be 'QRR' for QR bill with standard reference"
     end
-    
-    if params[:bill_params][:reference] == "" || params[:bill_params][:reference] == nil
-      raise ArgumentError, "#{QRExceptions::INVALID_PARAMETERS}: reference cannot be blank for QR bill with standard reference"
+
+    if ['', nil].include?(params[:bill_params][:reference])
+      raise ArgumentError,
+            "#{QRExceptions::INVALID_PARAMETERS}: reference cannot be blank for QR bill with standard reference"
     end
 
     true
   end
 
   def self.qr_bill_with_creditor_reference_valid?(params)
-    if params[:bill_params][:reference_type] != "SCOR"
-      raise ArgumentError, "#{QRExceptions::INVALID_PARAMETERS}: reference type must be 'SCOR' for QR bill with (new) creditor reference"
+    if params[:bill_params][:reference_type] != 'SCOR'
+      raise ArgumentError,
+            "#{QRExceptions::INVALID_PARAMETERS}: reference type must be 'SCOR' for QR bill with (new) creditor reference"
     end
-    
-    if params[:bill_params][:reference] == "" || params[:bill_params][:reference] == nil
-      raise ArgumentError, "#{QRExceptions::INVALID_PARAMETERS}: reference cannot be blank for QR bill with (new) creditor reference"
+
+    if ['', nil].include?(params[:bill_params][:reference])
+      raise ArgumentError,
+            "#{QRExceptions::INVALID_PARAMETERS}: reference cannot be blank for QR bill with (new) creditor reference"
     end
 
     true
   end
 
   def self.qr_bill_without_reference_valid?(params)
-    if params[:bill_params][:reference_type] != "NON"
-      raise ArgumentError, "#{QRExceptions::INVALID_PARAMETERS}: reference type must be 'NON' for QR bill without reference"
+    if params[:bill_params][:reference_type] != 'NON'
+      raise ArgumentError,
+            "#{QRExceptions::INVALID_PARAMETERS}: reference type must be 'NON' for QR bill without reference"
     end
-    
-    if params[:bill_params][:reference] != ""
+
+    if params[:bill_params][:reference] != ''
       raise ArgumentError, "#{QRExceptions::INVALID_PARAMETERS}: reference must be blank for QR bill without reference"
     end
-  
+
     true
   end
 end
