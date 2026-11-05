@@ -9,22 +9,7 @@ module QRPRAWNLayout
   attr_reader :document, :type
 
   def self.create(params, pdf = nil)
-    qrcode = QRGenerator.create(params, params[:qrcode_filepath])
-    params[:qrcode_filepath] = convert_qrcode_to_data_url(qrcode)
     prawn_layout(params, pdf)
-  end
-
-  def self.convert_qrcode_to_data_url(qrcode)
-    # Stolen from sprockets
-    # https://github.com/rails/sprockets/blob/0f3e0e93dabafa8f3027e8036e40fd08902688c8/lib/sprockets/context.rb#L295-L303
-    data = CGI.escape(qrcode)
-    data.gsub!('%3D', '=')
-    data.gsub!('%3A', ':')
-    data.gsub!('%2F', '/')
-    data.gsub!('%27', "'")
-    data.tr!('+', ' ')
-
-    "data:image/svg+xml;charset=utf-8,#{data}"
   end
 
   def self.prawn_layout(params, pdf)

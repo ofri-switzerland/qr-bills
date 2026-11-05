@@ -14,7 +14,7 @@ module QRBills
     %i[it en de fr].each do |locale|
       locale_file = File.join(qr_params[:locales][:path], "qrbills.#{locale}.yml")
 
-      I18n.load_path << locale_file
+      I18n.load_path << locale_file unless I18n.load_path.include?(locale_file)
     end
 
     output = case qr_params[:output_params][:format]

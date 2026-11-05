@@ -60,13 +60,21 @@ RSpec.describe "QRPRAWNLayout" do
     end
 
     it "generates svg qrcode" do
-      expect(@params[:qrcode_filepath]).to_not include("data:image/svg+xml;")
-
       prawn_output = QRPRAWNLayout.create(@params, @pdf)
       IO.binwrite(filepath, prawn_output)
       expect(File.exist?(filepath)).to be_truthy
+    end
 
-      expect(@params[:qrcode_filepath]).to include("data:image/svg+xml;")
+    it "encodes the qr code once" do
+      expect(QRGenerator).to receive(:build_svg).once.and_call_original
+
+      QRPRAWNLayout.create(@params, @pdf)
+    end
+
+    it "does not set the html layout's qrcode data url" do
+      QRPRAWNLayout.create(@params, @pdf)
+
+      expect(@params[:qrcode_filepath]).to eq('')
     end
 
     it "does not overwrite locale" do
